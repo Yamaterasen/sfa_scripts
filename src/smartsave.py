@@ -25,6 +25,20 @@ class SmartSaveUI(QtWidgets.QDialog):
         self.setMinimumHeight(200)
         self.setWindowFlags(self.windowFlags() ^
                             QtCore.Qt.WindowContextHelpButtonHint)
+        self.create_ui()
+
+    def create_ui(self):
+        self.title_lbl = QtWidgets.QLabel("Smart Save")
+        self.title_lbl.setStyleSheet("font: bold 20px")
+        self.folder_le = QtWidgets.QLineEdit("D:\\")
+        self.folder_browse_btn = QtWidgets.QPushButton("...")
+        layout = QtWidgets.QHBoxLayout()
+        layout.addWidget(self.folder_le)
+        layout.addWidget(self.folder_browse_btn)
+        self.main_lay = QtWidgets.QVBoxLayout()
+        self.main_lay.addWidget(self.title_lbl)
+        self.main_lay.addLayout(layout)
+        self.setLayout(self.main_lay)
 
 
 class SceneFile(object):
