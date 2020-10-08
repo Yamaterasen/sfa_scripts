@@ -40,6 +40,25 @@ class SmartSaveUI(QtWidgets.QDialog):
         self.setLayout(self.main_lay)
 
     def _create_filename_ui(self):
+        layout = self._create_filename_headers()
+        self.descriptor_le = QtWidgets.QLineEdit("main")
+        self.descriptor_le.setMinimumWidth(100)
+        self.task_le = QtWidgets.QLineEdit("model")
+        self.task_le.setFixedWidth(50)
+        self.ver_sbx = QtWidgets.QSpinBox()
+        self.ver_sbx.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
+        self.ver_sbx.setFixedWidth(50)
+        self.ver_sbx.setValue(1)
+        self.ext_lbl = QtWidgets.QLabel(".ma")
+        layout.addWidget(self.descriptor_le, 1, 0)
+        layout.addWidget(QtWidgets.QLabel("_"), 1, 1)
+        layout.addWidget(self.task_le, 1, 2)
+        layout.addWidget(QtWidgets.QLabel("_v"), 1, 3)
+        layout.addWidget(self.ver_sbx, 1, 4)
+        layout.addWidget(self.ext_lbl, 1, 5)
+        return layout
+
+    def _create_filename_headers(self):
         self.descriptor_header_lbl = QtWidgets.QLabel("Descriptor")
         self.descriptor_header_lbl.setStyleSheet("font: bold")
         self.task_header_lbl = QtWidgets.QLabel("Task")
