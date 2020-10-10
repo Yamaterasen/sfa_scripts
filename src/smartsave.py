@@ -129,6 +129,7 @@ class SmartSaveUI(QtWidgets.QDialog):
         layout.addWidget(self.folder_browse_btn)
         return layout
 
+
 class SceneFile(object):
     """An abstract representation of a Scene file."""
     def __init__(self, path=None):
