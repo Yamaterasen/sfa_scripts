@@ -7,7 +7,6 @@ import maya.OpenMayaUI as omui
 import maya.cmds as cmds
 import pymel.core as pmc
 from pymel.core.system import Path
-
 log = logging.getLogger(__name__)
 
 
@@ -19,6 +18,7 @@ def maya_main_window():
 
 class SmartSaveUI(QtWidgets.QDialog):
     """Smart Save UI Class"""
+
     def __init__(self):
         super(SmartSaveUI, self).__init__(parent=maya_main_window())
         self.setWindowTitle("Smart Save")
@@ -28,6 +28,7 @@ class SmartSaveUI(QtWidgets.QDialog):
                             QtCore.Qt.WindowContextHelpButtonHint)
         self.scenefile = SceneFile()
         self.create_ui()
+        self.create_connections()
 
     def create_ui(self):
         self.title_lbl = QtWidgets.QLabel("Smart Save")
@@ -42,6 +43,18 @@ class SmartSaveUI(QtWidgets.QDialog):
         self.main_lay.addStretch()
         self.main_lay.addLayout(self.button_lay)
         self.setLayout(self.main_lay)
+
+    def create_connections(self):
+        self.folder_browse_btn.clicked.connect(self._browse_folder)
+
+    @QtCore.Slot()
+    def _browse_folder(self):
+        """Opens a dialogue box to browse the folder"""
+        folder = QtWidgets.QFileDialog.getExistingDirectory(
+            parent=self, caption="Select folder", dir=self.folder_le.text(),
+            options=QtWidgets.QFileDialog.ShowDirsOnly |
+                QtWidgets.QFileDialog.DontResolveSymlinks)
+        self.folder_le.setText(folder)
 
     def _create_button_ui(self):
         self.save_btn = QtWidgets.QPushButton("Save")
@@ -106,9 +119,9 @@ class SceneFile(object):
         scene = pmc.system.sceneName()
         if not path and scene:
             path = scene
-            if not path and not scene:
-                log.info("Initialize with default properties.")
-                return
+        if not path and not scene:
+            log.info("Initialize with default properties.")
+            return
         self._init_from_path(path)
 
     @property
