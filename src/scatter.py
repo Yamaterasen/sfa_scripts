@@ -85,3 +85,63 @@ class ScatterUI(QtWidgets.QDialog):
     def create_connections(self):
         """Connect Signals and Slots"""
         self.scatter_btn.clicked.connect(self._scatter)
+
+    @QtCore.Slot()
+    def _scatter(self):
+        """Scatter objects using player input"""
+        self.rotationMax = float(self.rotation_le.text())
+        self.scatter.scatter_objects((0, self.rotationMax), (1, 1))
+
+
+class Scatter(object):
+    """Scatter objects using random transform, rotation, and scale"""
+
+    def scatter_objects(self, rand_rotation, rand_scale):
+        selection = cmds.ls(orderedSelection=True, flatten=True)
+        vertex_names = cmds.filterExpand(selection, selectionMask=31,
+                                         expand=True)
+
+        # Create a group to contain scatter objects
+        scatter_group = cmds.group(em=True, n='scatter_group')
+        object_to_instance = selection[0]
+        if cmds.objectType(object_to_instance) == 'transform':
+            for vertex in vertex_names:
+                new_instance = cmds.instance(object_to_instance)
+                position = cmds.pointPosition(vertex, world=True)
+
+                # Position and add random rotation and scale
+                new_position = [x for x in position]
+                new_rotation = [random.uniform(rand_rotation[0],
+                                               rand_rotation[1])
+                                for _ in range(3)]
+                new_scale = [random.uniform(rand_scale[0], rand_scale[1])
+                             for _ in range(3)]
+
+                # Move objects to position
+                cmds.move(new_position[0],
+                          new_position[1],
+                          new_position[2],
+                          new_instance,
+                          absolute=True,
+                          worldSpace=True)
+
+                # Set object rotation
+                cmds.rotate(new_rotation[0],
+                            new_rotation[1],
+                            new_rotation[2],
+                            new_instance,
+                            relative=True,
+                            objectSpace=True)
+
+                # Set object scale
+                cmds.scale(new_scale[0],
+                           new_scale[1],
+                           new_scale[2],
+                           new_instance,
+                           relative=True)
+
+                # Parent new instances to the scatter group from earlier
+                cmds.parent(new_instance, scatter_group)
+
+        else:
+            print("Please ensure the first object you select is a transform.")
