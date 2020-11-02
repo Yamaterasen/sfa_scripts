@@ -96,9 +96,9 @@ class ScatterUI(QtWidgets.QDialog):
     @QtCore.Slot()
     def _scatter(self):
         """Scatter objects using player input"""
-        self.rotation_max = float(self.rotation_sbx.text())
-        self.scale_min = float(self.scale_min_sbx.text())
-        self.scale_max = float(self.scale_max_sbx.text())
+        self.rotation_max = self.rotation_sbx.value()
+        self.scale_min = self.scale_min_sbx.value()
+        self.scale_max = self.scale_max_sbx.value()
         self.scatter.scatter_objects((0, self.rotation_max),
                                      (self.scale_min, self.scale_max))
 
