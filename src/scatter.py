@@ -44,25 +44,26 @@ class ScatterUI(QtWidgets.QDialog):
 
     def _create_button_ui(self):
         self.scatter_btn = QtWidgets.QPushButton("Scatter")
-        self.save_increment_btn = QtWidgets.QPushButton("Save Increment")
         layout = QtWidgets.QHBoxLayout()
         layout.addWidget(self.scatter_btn)
-        layout.addWidget(self.save_increment_btn)
         return layout
 
     def _create_features_ui(self):
         layout = self._create_features_headers()
         self.density_le = QtWidgets.QLineEdit()
         self.density_le.setFixedWidth(50)
-        self.scale_le = QtWidgets.QLineEdit()
-        self.scale_le.setFixedWidth(50)
+        self.scale_min_le = QtWidgets.QLineEdit()
+        self.scale_min_le.setFixedWidth(50)
+        self.scale_max_le = QtWidgets.QLineEdit()
+        self.scale_max_le.setFixedWidth(50)
         self.rotation_le = QtWidgets.QLineEdit()
         self.rotation_le.setFixedWidth(50)
         # self.rotation_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.spacing = QtWidgets.QLabel("")
         layout.addWidget(self.density_le, 0, 1)
-        layout.addWidget(self.scale_le, 1, 1)
-        layout.addWidget(self.rotation_le, 2, 1)
+        layout.addWidget(self.scale_min_le, 2, 1)
+        layout.addWidget(self.scale_max_le, 2, 2)
+        layout.addWidget(self.rotation_le, 3, 1)
         layout.addWidget(self.spacing, 0, 2)
         layout.addWidget(self.spacing, 0, 3)
         layout.addWidget(self.spacing, 0, 4)
@@ -74,12 +75,18 @@ class ScatterUI(QtWidgets.QDialog):
         self.density_header_lbl.setStyleSheet("font: bold")
         self.scale_header_lbl = QtWidgets.QLabel("Scale")
         self.scale_header_lbl.setStyleSheet("font: bold")
+        self.scale_min_header_lbl = QtWidgets.QLabel("Min")
+        self.scale_min_header_lbl.setStyleSheet("font: bold")
+        self.scale_max_header_lbl = QtWidgets.QLabel("Max")
+        self.scale_max_header_lbl.setStyleSheet("font: bold")
         self.rotation_header_lbl = QtWidgets.QLabel("Rotation")
         self.rotation_header_lbl.setStyleSheet("font: bold")
         layout = QtWidgets.QGridLayout()
         layout.addWidget(self.density_header_lbl, 0, 0)
-        layout.addWidget(self.scale_header_lbl, 1, 0)
-        layout.addWidget(self.rotation_header_lbl, 2, 0)
+        layout.addWidget(self.scale_min_header_lbl, 1, 1)
+        layout.addWidget(self.scale_max_header_lbl, 1, 2)
+        layout.addWidget(self.scale_header_lbl, 2, 0)
+        layout.addWidget(self.rotation_header_lbl, 3, 0)
         return layout
 
     def create_connections(self):
@@ -89,8 +96,11 @@ class ScatterUI(QtWidgets.QDialog):
     @QtCore.Slot()
     def _scatter(self):
         """Scatter objects using player input"""
-        self.rotationMax = float(self.rotation_le.text())
-        self.scatter.scatter_objects((0, self.rotationMax), (1, 1))
+        self.rotation_max = float(self.rotation_le.text())
+        self.scale_min = float(self.scale_min_le.text())
+        self.scale_max = float(self.scale_max_le.text())
+        self.scatter.scatter_objects((0, self.rotation_max),
+                                     (self.scale_min, self.scale_max))
 
 
 class Scatter(object):
