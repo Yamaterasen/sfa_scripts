@@ -104,17 +104,44 @@ class ScatterUI(QtWidgets.QDialog):
         self.rotation_max = self.rotation_sbx.value()
         self.scale_min = self.scale_min_sbx.value()
         self.scale_max = self.scale_max_sbx.value()
+        self.aligned_to_normals = self.align_to_normals_checkbox.checkState()
+        print(self.aligned_to_normals)
         self.scatter.scatter_objects((0, self.rotation_max),
-                                     (self.scale_min, self.scale_max))
+                                     (self.scale_min, self.scale_max),
+                                     self.aligned_to_normals)
 
 
 class Scatter(object):
     """Scatter objects using random transform, rotation, and scale"""
 
-    def scatter_objects(self, rand_rotation, rand_scale):
+    def scatter_objects(self, rand_rotation, rand_scale, align_to_normals):
         selection = cmds.ls(orderedSelection=True, flatten=True)
         vertex_names = cmds.filterExpand(selection, selectionMask=31,
                                          expand=True)
+        face_names = cmds.polyListComponentConversion(vertex_names,
+                                                      fromVertex=True,
+                                                      toFace=True)
+        face_names = cmds.filterExpand(face_names, selectionMask=34,
+                                       expand=True)
+
+        face_normals = []
+        for face in face_names:
+            meshface = pmc.MeshFace(face)
+            face_normals.append(meshface.getNormal())
+
+        sum_of_normals = sum(face_normals)
+        ave_vtx_normal = sum_of_normals / len(sum_of_normals)
+        tangent = ave_vtx_normal.cross(pmc.dt.Vector(0, 1, 0))
+        tangent.normalize()
+        tangent2 = ave_vtx_normal.cross(tangent)
+        tangent2.normalize()
+        pos = cmds.xform(vertex_names, query=True, worldSpace=True,
+                         translation=True)
+
+        matrix = [tangent2.x, tangent2.y, tangent2.z, 0.0,
+                  ave_vtx_normal.x, ave_vtx_normal.y, ave_vtx_normal.z, 0.0,
+                  tangent.x, tangent.y, tangent.z, 0.0,
+                  pos[0], pos[1], pos[2], 1.0]
 
         # Create a group to contain scatter objects
         scatter_group = cmds.group(em=True, n='scatter_group')
@@ -131,7 +158,8 @@ class Scatter(object):
                                 for _ in range(3)]
                 new_scale = [random.uniform(rand_scale[0], rand_scale[1])
                              for _ in range(3)]
-
+                if align_to_normals:
+                    cmds.xform(new_instance, worldSpace=True, matrix=matrix)
                 # Move objects to position
                 cmds.move(new_position[0],
                           new_position[1],
