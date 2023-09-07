@@ -1,2 +1,2 @@
 # sfa_scripts
-Python scripts associated with our tools development class
+Python scripts associated with tools development class
